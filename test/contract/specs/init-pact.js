@@ -8,7 +8,7 @@ export function getProvider() {
     return new Pact({
         consumer: consumerName,
         provider: providerName,
-        port: 8091,
+        port: 8080,
         cors: true,
         log: path.resolve(process.cwd(),'./test/contract/logs', `${consumerName}-${providerName}.log`),
         dir: path.resolve(process.cwd(), './test/contract/pacts'),
