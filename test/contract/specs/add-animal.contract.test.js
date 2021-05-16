@@ -1,51 +1,43 @@
-import { getProvider } from "./init-pact";
+import { getProvider } from './init-pact';
 import { AnimalController } from "../../../controllers";
 import { Matchers } from "@pact-foundation/pact";
-import {somethingLike} from "@pact-foundation/pact/src/dsl/matchers";
 
 const provider = getProvider();
-describe('Given an Animal Service', () => {
-    describe('When a request to create a new animal is made', () => {
-        beforeAll(async () => {
-            await provider.setup();
+describe('Given An Animal Service', () => {
+    const animalMock = {
+        name: "Manchitas",
+        breed: "Crillo",
+        gender: "Female",
+        vaccinated:true,
+    }
+
+    beforeAll(async ()=>{
+        await provider.setup();
+    });
+
+    describe('When a request the animals create', () =>{
+        beforeAll(async ()=>{
             await provider.addInteraction({
-                state: 'create animal',
-                uponReceiving: 'a request to create an animal',
+                uponReceiving: 'a request to get the animal created',
+                state:"save animal",
                 withRequest: {
                     method: 'POST',
                     path: '/animals',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
+                    body: animalMock,
                 },
                 willRespondWith: {
-                    status: 201,
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: Matchers.somethingLike(
-                        {
-                            breed: Matchers.like("Bengali"),
-                            gender: Matchers.like("Female"),
-                            name: Matchers.string("Manchas"),
-                            vaccinated: Matchers.boolean(true),
-                            // maybe vaccines
-                        }
-                    )
+                    status:201,
+                    body: Matchers.like(animalMock),
                 }
             });
         });
-
         it("Then it should return the right data", async() => {
-            const animalBody = {name: 'My cat', breed: 'Azul Ruso', gender: 'Male', isVaccinated: true, 'vaccines': ['moquillo', 'gripe', 'leucemia']};
-            const response = await AnimalController.register(animalBody)
+            const response = await AnimalController.register(animalMock);
             expect(response.data).toMatchSnapshot();
-
             await provider.verify();
         });
-
-        afterAll(async () => {
-            await provider.finalize();
-        });
+    });
+    afterAll(async ()=>{
+        await provider.finalize();
     });
 });
