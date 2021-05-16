@@ -19,7 +19,7 @@ describe('Given An Animal Service', () => {
         beforeAll(async ()=>{
             await provider.addInteraction({
                 uponReceiving: 'a request to get the animal created',
-                state:"save animal",
+                state:"create animal",
                 withRequest: {
                     method: 'POST',
                     path: '/animals',
